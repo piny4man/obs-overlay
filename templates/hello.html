@@ -1,1 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+
 Hello, {{ name }}
+<div id="parent-div"></div>
+<button hx-get="/api/hello" hx-target="#parent-div" hx-swap="innerHTML">
+  Click Me!
+</button>
+{% endblock %}

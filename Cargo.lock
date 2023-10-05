@@ -1096,12 +1096,14 @@ dependencies = [
 name = "obs-overlay"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "askama",
  "askama_axum",
  "axum",
  "shuttle-axum",
  "shuttle-runtime",
  "tokio",
+ "tower-http",
 ]
 
 [[package]]
@@ -2210,7 +2212,13 @@ dependencies = [
  "http",
  "http-body",
  "http-range-header",
+ "httpdate",
+ "mime",
+ "mime_guess",
+ "percent-encoding",
  "pin-project-lite",
+ "tokio",
+ "tokio-util",
  "tower-layer",
  "tower-service",
  "tracing",
