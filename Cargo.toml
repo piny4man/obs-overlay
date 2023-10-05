@@ -1,0 +1,12 @@
+[package]
+name = "obs-overlay"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+askama = { version = "0.12", features = ["with-axum"] }
+askama_axum = "0.3.0"
+axum = "0.6.18"
+shuttle-axum = "0.28.0"
+shuttle-runtime = "0.28.0"
+tokio = "1.28.2"
