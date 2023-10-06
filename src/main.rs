@@ -1,13 +1,29 @@
-use std::path::PathBuf;
+use std::{collections::HashMap, path::PathBuf};
 
 use askama::Template;
 use axum::{
+    extract::Path,
     http::StatusCode,
     response::{Html, IntoResponse, Response},
     routing::get,
     Router,
 };
+use octocrab::models::Repository;
+use reqwest::{Client, Url};
+use serde::{Deserialize, Serialize};
 use tower_http::services::ServeDir;
+
+#[derive(Debug, Deserialize)]
+struct RepoRequest {
+    owner: String,
+    repo: String,
+}
+
+#[derive(Debug, Serialize)]
+struct RepoResponse {
+    repo: Repository,
+    languages: HashMap<String, u64>,
+}
 
 #[derive(Template)]
 #[template(path = "hello.html")]
@@ -42,9 +58,53 @@ async fn hello_from_the_server() -> &'static str {
     "Hello!"
 }
 
+async fn get_repository_languages(url: Url) -> Result<HashMap<String, u64>, (StatusCode, String)> {
+    let response = Client::new()
+        .get(url)
+        .header("User-Agent", "repos-toolbox-api")
+        .send()
+        .await
+        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+    if !response.status().is_success() {
+        let error_message = format!(
+            "Error fetching language data. Status code: {}",
+            response.status()
+        );
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, error_message));
+    }
+
+    let response_text = response
+        .text()
+        .await
+        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+    let languages: HashMap<String, u64> = serde_json::from_str(&response_text)
+        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+    Ok(languages)
+}
+
+async fn get_repository(
+    Path((owner, repo)): Path<(String, String)>,
+) -> Result<RepoResponse, (StatusCode, String)> {
+    let repo = octocrab::instance()
+        .repos(owner, repo)
+        .get()
+        .await
+        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+    let url = repo.clone().languages_url.unwrap();
+    let languages: HashMap<String, u64> = get_repository_languages(url).await?;
+
+    Ok(RepoResponse { repo, languages })
+}
+
 #[shuttle_runtime::main]
 async fn axum() -> shuttle_axum::ShuttleAxum {
-    let api_router = Router::new().route("/hello", get(hello_from_the_server));
+    let api_router = Router::new()
+        .route("/hello", get(hello_from_the_server))
+        .route("/repo/:owner/:repo", get(get_repository));
     let router = Router::new()
         .nest("/api", api_router)
         .route("/", get(hello_world))
