@@ -2,3 +2,107 @@ body {
   background-color: darkslategrey;
   color: whitesmoke;
 }
+
+.card__container {
+  background-color: white;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  color: #1c1c1c;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+  transition: all 0.1s ease-in-out;
+  max-width: 380px;
+  width: 380px;
+  min-height: 175px;
+  margin: 10px;
+  overflow: hidden;
+
+  &:hover,
+  &:active {
+    transform: translateY(-2px);
+    // box-shadow: 0 8px 16px rgba(0, 0, 0, 0.26);
+    filter: drop-shadow(0 0 1em #746CC0CC);
+  }
+
+  > a {
+    color: inherit;
+    text-decoration: none;
+    font-weight: inherit;
+    height: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+
+    > header {
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+
+      > h2 {
+        color: #1c1c1c;
+        margin: 0;
+        text-align: left;
+        font-weight: normal;
+        font-size: 20px;
+
+        > em {
+          font-weight: bold;
+        }
+      }
+
+      > img {
+        max-width: 60px;
+        height: auto;
+      }
+    }
+
+    > footer {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 20px;
+      color: #1c1c1c;
+      margin-top: auto;
+
+      > section {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 0 20px;
+        box-sizing: border-box;
+
+        &:first-of-type {
+          flex: 1;
+        }
+
+        > div {
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-start;
+          align-items: center;
+          margin-right: 8px;
+          font-size: 16px;
+
+          > span {
+            &:first-of-type {
+              margin-right: 4px;
+              color: #868fa9;
+            }
+            &:last-of-type {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
