@@ -1,5 +1,6 @@
 use std::{collections::HashMap, path::PathBuf};
 
+use anyhow::{Error, Result};
 use askama::Template;
 use axum::{
     extract::Path,
@@ -49,6 +50,28 @@ where
     }
 }
 
+struct AppError(anyhow::Error);
+
+// Tell axum how to convert `AppError` into a response.
+impl IntoResponse for AppError {
+    fn into_response(self) -> Response {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Something went wrong: {}", self.0),
+        )
+            .into_response()
+    }
+}
+
+impl<E> From<E> for AppError
+where
+    E: Into<anyhow::Error>,
+{
+    fn from(err: E) -> Self {
+        Self(err.into())
+    }
+}
+
 async fn hello_world() -> impl IntoResponse {
     let template = HelloTemplate { name: "world" };
     HtmlTemplate(template)
@@ -58,7 +81,7 @@ async fn hello_from_the_server() -> &'static str {
     "Hello!"
 }
 
-async fn get_repository_languages(url: Url) -> Result<HashMap<String, u64>, (StatusCode, String)> {
+async fn get_repository_languages(url: Url) -> Result<HashMap<String, u64>, AppError> {
     let response = Client::new()
         .get(url)
         .header("User-Agent", "repos-toolbox-api")
@@ -71,28 +94,25 @@ async fn get_repository_languages(url: Url) -> Result<HashMap<String, u64>, (Sta
             "Error fetching language data. Status code: {}",
             response.status()
         );
-        return Err((StatusCode::INTERNAL_SERVER_ERROR, error_message));
+        return Err(Error::msg(error_message));
     }
 
-    let response_text = response
-        .text()
-        .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+    let response_text = response.text().await.map_err(|e| Error::msg(e))?;
 
-    let languages: HashMap<String, u64> = serde_json::from_str(&response_text)
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+    let languages: HashMap<String, u64> =
+        serde_json::from_str(&response_text).map_err(|e| Error::msg(e))?;
 
     Ok(languages)
 }
 
 async fn get_repository(
     Path((owner, repo)): Path<(String, String)>,
-) -> Result<RepoResponse, (StatusCode, String)> {
+) -> Result<RepoResponse, Error> {
     let repo = octocrab::instance()
         .repos(owner, repo)
         .get()
         .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+        .map_err(|e| Error::msg(e))?;
 
     let url = repo.clone().languages_url.unwrap();
     let languages: HashMap<String, u64> = get_repository_languages(url).await?;
