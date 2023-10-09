@@ -43,6 +43,12 @@ struct ErrorTemplate {
 struct RepoTemplate {
     name: String,
     owner: String,
+    html_url: String,
+    avatar_url: String,
+    open_issues_count: u32,
+    stargazers_count: u32,
+    watchers_count: u32,
+    forks_count: u32,
 }
 
 struct HtmlTemplate<T>(T);
@@ -109,11 +115,38 @@ async fn get_repository(
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
 
     let repo = response.clone();
-    // let url = response.clone().languages_url.unwrap();
-    // let languages: HashMap<String, u64> = get_repository_languages(url).await?;
+    let url = response.clone().languages_url.unwrap();
+    let languages: HashMap<String, u64> = get_repository_languages(url).await?;
     let template = RepoTemplate {
         name: repo.name,
-        owner: "piny4man".to_string(),
+        owner: match repo.owner.clone() {
+            Some(owner) => owner.login,
+            None => "unknown".to_string(),
+        },
+        html_url: match repo.html_url {
+            Some(url) => url.to_string(),
+            None => "/".to_string(),
+        },
+        avatar_url: match repo.owner.clone() {
+            Some(owner) => owner.avatar_url.to_string(),
+            None => "/".to_string(),
+        },
+        open_issues_count: match repo.open_issues_count.clone() {
+            Some(count) => count,
+            None => 0,
+        },
+        stargazers_count: match repo.stargazers_count.clone() {
+            Some(count) => count,
+            None => 0,
+        },
+        watchers_count: match repo.watchers_count.clone() {
+            Some(count) => count,
+            None => 0,
+        },
+        forks_count: match repo.forks_count.clone() {
+            Some(count) => count,
+            None => 0,
+        },
     };
 
     Ok(HtmlTemplate(template))
