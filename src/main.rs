@@ -13,6 +13,10 @@ use reqwest::{Client, Url};
 use serde::{Deserialize, Serialize};
 use tower_http::services::ServeDir;
 
+mod utils;
+
+use utils::language::{get_language_color, get_language_size};
+
 #[derive(Debug, Deserialize)]
 struct RepoRequest {
     owner: String,
@@ -23,6 +27,13 @@ struct RepoRequest {
 struct RepoResponse {
     repo: Repository,
     languages: HashMap<String, u64>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Language {
+    name: String,
+    size: f64,
+    color: String,
 }
 
 #[derive(Template)]
@@ -49,6 +60,7 @@ struct RepoTemplate {
     stargazers_count: u32,
     watchers_count: u32,
     forks_count: u32,
+    languages: Vec<Language>,
 }
 
 struct HtmlTemplate<T>(T);
@@ -78,7 +90,7 @@ async fn hello_from_the_server() -> &'static str {
     "Hello!"
 }
 
-async fn get_repository_languages(url: Url) -> Result<HashMap<String, u64>, (StatusCode, String)> {
+async fn get_repository_languages(url: Url) -> Result<Vec<Language>, (StatusCode, String)> {
     let response = Client::new()
         .get(url)
         .header("User-Agent", "repos-toolbox-api")
@@ -99,8 +111,18 @@ async fn get_repository_languages(url: Url) -> Result<HashMap<String, u64>, (Sta
         .await
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
 
-    let languages: HashMap<String, u64> = serde_json::from_str(&response_text)
+    let languages_response: HashMap<String, u64> = serde_json::from_str(&response_text)
+        // .map(|lang: u64| )
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+    let languages_total = languages_response.values().sum::<u64>();
+    let mut languages: Vec<Language> = Vec::new();
+
+    for (name, value) in languages_response {
+        let size = get_language_size(&value, &languages_total);
+        let color = get_language_color(&name).trim_matches('"').to_string();
+        let language = Language { name, size, color };
+        languages.push(language);
+    }
 
     Ok(languages)
 }
@@ -116,7 +138,7 @@ async fn get_repository(
 
     let repo = response.clone();
     let url = response.clone().languages_url.unwrap();
-    let languages: HashMap<String, u64> = get_repository_languages(url).await?;
+    let languages: Vec<Language> = get_repository_languages(url).await?;
     let template = RepoTemplate {
         name: repo.name,
         owner: match repo.owner.clone() {
@@ -131,22 +153,11 @@ async fn get_repository(
             Some(owner) => owner.avatar_url.to_string(),
             None => "/".to_string(),
         },
-        open_issues_count: match repo.open_issues_count.clone() {
-            Some(count) => count,
-            None => 0,
-        },
-        stargazers_count: match repo.stargazers_count.clone() {
-            Some(count) => count,
-            None => 0,
-        },
-        watchers_count: match repo.watchers_count.clone() {
-            Some(count) => count,
-            None => 0,
-        },
-        forks_count: match repo.forks_count.clone() {
-            Some(count) => count,
-            None => 0,
-        },
+        open_issues_count: repo.open_issues_count.unwrap_or(0),
+        stargazers_count: repo.stargazers_count.unwrap_or(0),
+        watchers_count: repo.watchers_count.unwrap_or(0),
+        forks_count: repo.forks_count.unwrap_or(0),
+        languages,
     };
 
     Ok(HtmlTemplate(template))

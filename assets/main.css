@@ -8,7 +8,7 @@ body {
   align-items: center;
   width: 100vw;
   min-height: 100vh;
-  padding: 40px;
+  padding: 16px;
   margin: 0;
   box-sizing: border-box;
 }
@@ -23,10 +23,10 @@ body {
   color: #1c1c1c;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
   transition: all 0.1s ease-in-out;
-  max-width: 380px;
-  width: 380px;
-  min-height: 175px;
-  margin: 10px;
+  max-width: 100%;
+  width: 100%;
+  min-height: calc(100vh - 32px);
+  margin: 0;
   overflow: hidden;
   filter: drop-shadow(0 0 1em #ffbf00cc);
 }
@@ -107,4 +107,13 @@ body {
 }
 .card__container > a > footer > section > div > span:last-of-type {
   font-size: 14px;
+}
+
+.languages__container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: stretch;
+  height: 15px;
+  margin-top: 18px;
 }
