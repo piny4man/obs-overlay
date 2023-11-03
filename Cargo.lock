@@ -908,6 +908,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28b29a3cd74f0f4598934efe3aeba42bae0eb4680554128851ebbecb02af14e6"
 
 [[package]]
+name = "iri-string"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21859b667d66a4c1dacd9df0863b3efb65785474255face87f5bca39dd8407c0"
+dependencies = [
+ "memchr",
+ "serde",
+]
+
+[[package]]
 name = "is-terminal"
 version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -949,8 +959,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6971da4d9c3aa03c3d8f3ff0f4155b534aad021292003895a469716b2a230378"
 dependencies = [
  "base64 0.21.4",
- "pem",
- "ring",
+ "pem 1.1.1",
+ "ring 0.16.20",
+ "serde",
+ "serde_json",
+ "simple_asn1",
+]
+
+[[package]]
+name = "jsonwebtoken"
+version = "9.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "155c4d7e39ad04c172c5e3a99c434ea3b4a7ba7960b38ecd562b270b097cce09"
+dependencies = [
+ "base64 0.21.4",
+ "pem 3.0.2",
+ "ring 0.17.5",
  "serde",
  "serde_json",
  "simple_asn1",
@@ -1172,9 +1196,9 @@ dependencies = [
 
 [[package]]
 name = "octocrab"
-version = "0.31.0"
+version = "0.32.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ebb006c62700c309e112bed42fcb2372959c0b42ed4aea00dcd26ae2b9703af2"
+checksum = "abfeeafb5fa0da7046229ec3c7b3bd2981aae05c549871192c408d59fc0fffd5"
 dependencies = [
  "arc-swap",
  "async-trait",
@@ -1190,7 +1214,7 @@ dependencies = [
  "hyper",
  "hyper-rustls",
  "hyper-timeout",
- "jsonwebtoken",
+ "jsonwebtoken 9.1.0",
  "once_cell",
  "percent-encoding",
  "pin-project",
@@ -1390,6 +1414,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8835c273a76a90455d7344889b0964598e3316e2a79ede8e36f16bdcf2228b8"
 dependencies = [
  "base64 0.13.1",
+]
+
+[[package]]
+name = "pem"
+version = "3.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3163d2912b7c3b52d651a055f2c7eec9ba5cd22d26ef75b8dd3a59980b185923"
+dependencies = [
+ "base64 0.21.4",
+ "serde",
 ]
 
 [[package]]
@@ -1651,10 +1685,24 @@ dependencies = [
  "cc",
  "libc",
  "once_cell",
- "spin",
- "untrusted",
+ "spin 0.5.2",
+ "untrusted 0.7.1",
  "web-sys",
  "winapi",
+]
+
+[[package]]
+name = "ring"
+version = "0.17.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fb0205304757e5d899b9c2e448b867ffd03ae7f988002e47cd24954391394d0b"
+dependencies = [
+ "cc",
+ "getrandom",
+ "libc",
+ "spin 0.9.8",
+ "untrusted 0.9.0",
+ "windows-sys",
 ]
 
 [[package]]
@@ -1711,7 +1759,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cd8d6c9f025a446bc4d18ad9632e69aec8f287aa84499ee335599fabd20c3fd8"
 dependencies = [
  "log",
- "ring",
+ "ring 0.16.20",
  "rustls-webpki",
  "sct",
 ]
@@ -1743,8 +1791,8 @@ version = "0.101.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3c7d5dece342910d9ba34d259310cae3e0154b873b35408b787b59bce53d34fe"
 dependencies = [
- "ring",
- "untrusted",
+ "ring 0.16.20",
+ "untrusted 0.7.1",
 ]
 
 [[package]]
@@ -1797,8 +1845,8 @@ version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d53dcdb7c9f8158937a7981b48accfd39a43af418591a5d008c7b22b5e1b7ca4"
 dependencies = [
- "ring",
- "untrusted",
+ "ring 0.16.20",
+ "untrusted 0.7.1",
 ]
 
 [[package]]
@@ -1917,9 +1965,9 @@ dependencies = [
 
 [[package]]
 name = "shuttle-axum"
-version = "0.29.0"
+version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5bed2aaa9c681ec106b68468af560cfc9b72d599a5da6df1e15563e6678447dc"
+checksum = "f6e5907efdc8da608606c877f1e8f86757ab46f252c8cd15b3654be459761451"
 dependencies = [
  "axum",
  "shuttle-runtime",
@@ -1927,9 +1975,9 @@ dependencies = [
 
 [[package]]
 name = "shuttle-codegen"
-version = "0.29.0"
+version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c3019c84d317636a7a6ec4422e645d1a7a23467a9f7d7888e1f895de22912f0"
+checksum = "26923bd6e15984d3fce9f52fbac7d52d011885ffe79c0f566048f274068a1937"
 dependencies = [
  "proc-macro-error",
  "proc-macro2",
@@ -1939,9 +1987,9 @@ dependencies = [
 
 [[package]]
 name = "shuttle-common"
-version = "0.29.0"
+version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0a7c62201d9cbb6f1e68ddca84133c09c17e07f626454be6f1b3e81b02f66db0"
+checksum = "03089b45ff42d977b5c3df0ee8cf6cb147f8df65bc4c8068405a129e06380e46"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1955,7 +2003,7 @@ dependencies = [
  "http-body",
  "http-serde",
  "hyper",
- "jsonwebtoken",
+ "jsonwebtoken 8.3.0",
  "once_cell",
  "opentelemetry",
  "opentelemetry-http",
@@ -1978,13 +2026,14 @@ dependencies = [
  "tracing-subscriber",
  "ttl_cache",
  "uuid",
+ "zeroize",
 ]
 
 [[package]]
 name = "shuttle-proto"
-version = "0.29.0"
+version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f0d8eb484348a330f4b599fa0ca93ae3a35b750400dec66a0b051bc8bf708e44"
+checksum = "941c18c10cff167fff106cea13e46ab37f97a075a110468c791ae77b5bd6bc45"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2002,9 +2051,9 @@ dependencies = [
 
 [[package]]
 name = "shuttle-runtime"
-version = "0.29.0"
+version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ffcb33905113b15b0fa1b8af8abc50aeeaf9b4cf41638ee2a760ed6818f10c2e"
+checksum = "440141c29409f3ced3adcd709b68f55937ee34594691f809909dc411fee66307"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2028,9 +2077,9 @@ dependencies = [
 
 [[package]]
 name = "shuttle-service"
-version = "0.29.0"
+version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7574c6e64e89e8f3a44445db51fa28f439a42380bab58ea2b4a3d1fd822a3e7"
+checksum = "e3d4aab886670e782d491d5df8e62417b03509cbcbf2545d483b3dc453662209"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2145,6 +2194,12 @@ name = "spin"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
+
+[[package]]
+name = "spin"
+version = "0.9.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
 
 [[package]]
 name = "strfmt"
@@ -2466,12 +2521,14 @@ dependencies = [
  "http-body",
  "http-range-header",
  "httpdate",
+ "iri-string",
  "mime",
  "mime_guess",
  "percent-encoding",
  "pin-project-lite",
  "tokio",
  "tokio-util",
+ "tower",
  "tower-layer",
  "tower-service",
  "tracing",
@@ -2638,6 +2695,12 @@ name = "untrusted"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a156c684c91ea7d62626509bce3cb4e1d9ed5c4d978f7b4352658f96a4c26b4a"
+
+[[package]]
+name = "untrusted"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
 
 [[package]]
 name = "url"
